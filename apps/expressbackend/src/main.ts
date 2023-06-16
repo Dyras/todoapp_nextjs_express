@@ -1,10 +1,8 @@
 import { Todo } from './Itodo';
 import express from 'express';
-import fs from 'fs';
 
 // Things to do:
-// 1. Move to using in-memory storage
-// 2. Add a PUT for completing a todo
+// 1. Add a PUT for completing a todo
 
 const host = process.env.HOST ?? 'localhost';
 const port = process.env.PORT ? Number(process.env.PORT) : 3000;
@@ -12,13 +10,18 @@ const port = process.env.PORT ? Number(process.env.PORT) : 3000;
 const app = express();
 app.use(express.json());
 
+const todosStorage: Todo[] = [];
+
 app.listen(port, host, () => {
   console.log(`[ ready ] http://${host}:${port}`);
 });
 
+// This POST request is for creating a new todo
 app.post('/api/todos', (req, res) => {
   const { id, title, userId, description } = req.body;
   const status = false;
+
+  // Check if id and userId was included in the POST request, if not, return an error
   if (!id) {
     return res.status(400).json({ error: 'Invalid todo data, id is missing' });
   } else if (!userId) {
@@ -28,120 +31,46 @@ app.post('/api/todos', (req, res) => {
   }
 
   const newTodo: Todo = { id, title, userId, description, status };
-  const fileName = `${userId}.json`;
 
-  fs.readFile(fileName, 'utf8', (err, data) => {
-    if (err) {
-      if (err.code === 'ENOENT') {
-        const todos = { todos: [newTodo] };
-        fs.writeFile(fileName, JSON.stringify(todos, null, 2), (err) => {
-          if (err) {
-            console.error(err);
-            return res
-              .status(500)
-              .json({ error: 'Failed to save todo, write error' });
-          }
-          console.log('New todo created:', newTodo);
-          return res
-            .status(201)
-            .json({ message: 'Todo created successfully', todo: newTodo });
-        });
-        return;
-      }
-      console.error(err);
-      return res.status(500).json({ error: 'Failed to save todo' });
-    }
+  // Adds the new todo to the todo array
+  todosStorage.push(newTodo);
 
-    try {
-      const todos = JSON.parse(data);
-      todos.todos.push(newTodo);
-      fs.writeFile(fileName, JSON.stringify(todos, null, 2), (err) => {
-        if (err) {
-          console.error(err);
-          return res
-            .status(500)
-            .json({ error: 'Failed to save todo, write error' });
-        }
-        console.log('New todo created:', newTodo);
-        return res.status(201).json({
-          message: 'Todo written to disk successfully',
-          todo: newTodo,
-        });
-      });
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ error: 'Failed to save todo' });
-    }
-  });
+  console.log('New todo created:', newTodo);
+  return res
+    .status(201)
+    .json({ message: 'Todo created successfully', todo: newTodo });
 });
 
-app.get('/api/todos', (req, res) => {
-  return res.status(200).json({ message: 'Hello World' });
-});
-
+// This GET request is for getting all todos by a specific user
 app.get('/api/todos/:id', (req, res) => {
-  console.log(req.params.id);
-  console.log(req.params);
   const userId = req.params.id;
-  const fileName = `${userId}.json`;
-  fs.readFile(fileName, 'utf8', (err, data) => {
-    console.log(fileName);
-    if (err) {
-      if (err.code === 'ENOENT') {
-        return res.status(404).json({ error: 'Todo not found' });
-      }
-      console.error(err);
-      return res.status(500).json({ error: 'Failed to read todo' });
-    }
+  const userTodos = todosStorage.filter((todo) => todo.userId === userId);
 
-    try {
-      const todos = JSON.parse(data);
-      return res.status(200).json({ todos: todos.todos });
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ error: 'Failed to read todo' });
-    }
-  });
+  // Check if the user has created any todos, if there are none, return an error
+  if (userTodos.length === 0) {
+    return res.status(404).json({ error: 'No todos yet!' });
+  }
+
+  return res.status(200).json({ todos: userTodos });
 });
 
-// Edit a todo
+// This PUT request is for updating a todo
 app.put('/api/todos', (req, res) => {
-  console.log(req.body);
-  const { id, title, userId, description } = req.body;
-  const fileName = `${userId}.json`;
+  const { id, title, userId, description, status } = req.body;
+  const todoToUpdate = todosStorage.find((todo) => todo.id === id);
 
-  fs.readFile(fileName, 'utf8', (err, data) => {
-    if (err) {
-      if (err.code === 'ENOENT') {
-        return res.status(404).json({ error: 'Todo not found' });
-      }
-      console.error(err);
-      return res.status(500).json({ error: 'Failed to read todo' });
-    }
+  // Check if the todo exists, if it doesn't, return an error
+  if (!todoToUpdate) {
+    return res.status(404).json({ error: 'Todo not found' });
+  }
 
-    try {
-      const todos = JSON.parse(data);
-      const todoToUpdate = todos.todos.find((todo) => todo.id === id);
+  // Update the fields of the todo
+  if (userId == todoToUpdate.userId) {
+    todoToUpdate.title = title || todoToUpdate.title;
+    todoToUpdate.description = description || todoToUpdate.description;
+    todoToUpdate.status = status || todoToUpdate.status;
 
-      if (!todoToUpdate) {
-        return res.status(404).json({ error: 'Todo not found' });
-      }
-
-      // Update the fields of the todo
-      todoToUpdate.title = title || todoToUpdate.title;
-      todoToUpdate.description = description || todoToUpdate.description;
-
-      fs.writeFile(fileName, JSON.stringify(todos, null, 2), (err) => {
-        if (err) {
-          console.error(err);
-          return res.status(500).json({ error: 'Failed to update todo' });
-        }
-        console.log('Todo updated:', todoToUpdate);
-        return res.status(200).json({ message: 'Todo updated successfully' });
-      });
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ error: 'Failed to update todo' });
-    }
-  });
+    console.log('Todo updated:', todoToUpdate);
+    return res.status(200).json({ message: 'Todo updated successfully' });
+  }
 });
