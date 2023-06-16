@@ -130,7 +130,6 @@ app.put('/api/todos', (req, res) => {
       // Update the fields of the todo
       todoToUpdate.title = title || todoToUpdate.title;
       todoToUpdate.description = description || todoToUpdate.description;
-      todoToUpdate.status = req.body.status || todoToUpdate.status;
 
       fs.writeFile(fileName, JSON.stringify(todos, null, 2), (err) => {
         if (err) {
