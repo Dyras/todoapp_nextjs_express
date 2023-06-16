@@ -74,3 +74,22 @@ app.put('/api/todos', (req, res) => {
     return res.status(200).json({ message: 'Todo updated successfully' });
   }
 });
+
+// Set the status of a todo to complete
+app.put('/api/todos/complete', (req, res) => {
+  const { id, userId } = req.body;
+  const todoToUpdate = todosStorage.find((todo) => todo.id === id);
+
+  // If the todo is not found, return a 404 error
+  if (!todoToUpdate) {
+    return res.status(404).json({ error: 'Todo not found' });
+  }
+
+  // If the user id matches the todo's user id, set the status to true
+  if (userId == todoToUpdate.userId) {
+    todoToUpdate.status = true;
+
+    console.log('Todo completed:', todoToUpdate);
+    return res.status(200).json({ message: 'Todo completed successfully' });
+  }
+});
