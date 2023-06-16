@@ -70,3 +70,32 @@ app.post('/api/todos', (req, res) => {
     }
   });
 });
+
+app.get('/api/todos', (req, res) => {
+  return res.status(200).json({ message: 'Hello World' });
+});
+
+app.get('/api/todos/:id', (req, res) => {
+  console.log(req.params.id);
+  console.log(req.params);
+  const userId = req.params.id;
+  const fileName = `${userId}.json`;
+  fs.readFile(fileName, 'utf8', (err, data) => {
+    console.log(fileName);
+    if (err) {
+      if (err.code === 'ENOENT') {
+        return res.status(404).json({ error: 'Todo not found' });
+      }
+      console.error(err);
+      return res.status(500).json({ error: 'Failed to read todo' });
+    }
+
+    try {
+      const todos = JSON.parse(data);
+      return res.status(200).json({ todos: todos.todos });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: 'Failed to read todo' });
+    }
+  });
+});
