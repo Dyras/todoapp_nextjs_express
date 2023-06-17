@@ -101,7 +101,7 @@ export default function Home() {
               type="text"
               autoComplete="editTitle"
               required
-              value={editTitle} // Updated line
+              value={editTitle}
               onChange={(e) => setEditTitle(e.target.value)}
             />
             <label htmlFor="editDescription">Description:</label>
@@ -123,6 +123,7 @@ export default function Home() {
     </div>
   );
 
+  // Add a todo to the list and send it to the backend
   async function addTodo(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const title = (document.getElementById('title') as HTMLInputElement).value;
@@ -155,6 +156,7 @@ export default function Home() {
     }
   }
 
+  // Switch to edit mode on an existing todo
   function editModeTodo(whichTodo: ITodo) {
     setEditMode(true);
     setEditingTodo(whichTodo);
@@ -162,6 +164,7 @@ export default function Home() {
     setEditDescription(whichTodo.description || '');
   }
 
+  // Abort the edit mode
   function abortEdit() {
     setEditMode(false);
     setEditingTodo(null);
@@ -169,6 +172,7 @@ export default function Home() {
     setEditDescription('');
   }
 
+  // Edit a todo
   async function editTodo() {
     // Edit the todo
     if (editingTodo === null) return console.error('No todo to edit');
@@ -205,6 +209,7 @@ export default function Home() {
     }
   }
 
+  // Complete a todo
   function completeTodo(todoToComplete: string) {
     return async function () {
       const response = await fetch(`http://localhost:3000/api/todos/complete`, {
