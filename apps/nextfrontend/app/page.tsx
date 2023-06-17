@@ -9,6 +9,8 @@ export default function Home() {
   const [todos, setTodos] = useState<ITodo[]>([]);
   const [editMode, setEditMode] = useState<boolean>(false);
   const [editingTodo, setEditingTodo] = useState<ITodo | null>(null);
+  const [editTitle, setEditTitle] = useState<string>('');
+  const [editDescription, setEditDescription] = useState<string>('');
 
   useEffect(() => {
     // Create random user ID if none is found
@@ -37,12 +39,21 @@ export default function Home() {
           <h1 className={styles.title}>Add Todo</h1>
           <form onSubmit={addTodo}>
             <label htmlFor="title">Title:</label>
-            <input id="title" type="text" autoComplete="title" required />
+            <input
+              id="title"
+              type="text"
+              autoComplete="title"
+              value={editTitle}
+              onChange={(e) => setEditTitle(e.target.value)}
+              required
+            />
             <label htmlFor="description">Description:</label>
             <input
               id="description"
               type="text"
               autoComplete="description"
+              value={editDescription}
+              onChange={(e) => setEditDescription(e.target.value)}
               required
             />
             <button type="submit">Submit</button>
@@ -58,7 +69,7 @@ export default function Home() {
                     <p>{todo.description}</p>
                     <button onClick={() => editModeTodo(todo)}>Edit</button>
                     <br />
-                    <p onClick={completeTodo(todo.id)}>Click to complete</p>
+                    <button onClick={completeTodo(todo.id)}>Complete</button>
                     <br />
                   </div>
                 ) : null}
@@ -73,6 +84,7 @@ export default function Home() {
                   <div>
                     <h2>{todo.title}</h2>
                     <p>{todo.description}</p>
+                    <br />
                   </div>
                 ) : null}
               </div>
@@ -89,7 +101,8 @@ export default function Home() {
               type="text"
               autoComplete="editTitle"
               required
-              defaultValue={editingTodo.title}
+              value={editTitle} // Updated line
+              onChange={(e) => setEditTitle(e.target.value)}
             />
             <label htmlFor="editDescription">Description:</label>
             <input
@@ -97,7 +110,8 @@ export default function Home() {
               type="text"
               autoComplete="editDescription"
               required
-              defaultValue={editingTodo.description}
+              value={editDescription}
+              onChange={(e) => setEditDescription(e.target.value)}
             />
           </form>
           <button onClick={editTodo} type="submit">
@@ -134,6 +148,7 @@ export default function Home() {
         const data = await response.json();
         setTodos([...todos, data.todo]);
         // Clear the document fields
+        abortEdit();
       } else {
         console.error('Error:', response.status);
       }
@@ -143,11 +158,15 @@ export default function Home() {
   function editModeTodo(whichTodo: ITodo) {
     setEditMode(true);
     setEditingTodo(whichTodo);
+    setEditTitle(whichTodo.title || '');
+    setEditDescription(whichTodo.description || '');
   }
 
   function abortEdit() {
     setEditMode(false);
     setEditingTodo(null);
+    setEditTitle('');
+    setEditDescription('');
   }
 
   async function editTodo() {
@@ -182,8 +201,7 @@ export default function Home() {
         return todo;
       });
       setTodos(newTodosList);
-      setEditMode(false);
-      setEditingTodo(null);
+      abortEdit();
     }
   }
 
