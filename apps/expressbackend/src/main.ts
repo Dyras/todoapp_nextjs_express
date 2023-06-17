@@ -1,4 +1,5 @@
 import { ITodo } from './Itodo';
+import cors from 'cors';
 import express from 'express';
 
 // Things to do:
@@ -9,6 +10,7 @@ const port = process.env.PORT ? Number(process.env.PORT) : 3000;
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 const todosStorage: ITodo[] = [];
 
