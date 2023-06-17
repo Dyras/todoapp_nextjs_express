@@ -1,4 +1,4 @@
-import { Todo } from './Itodo';
+import { ITodo } from './Itodo';
 import express from 'express';
 
 // Things to do:
@@ -10,7 +10,7 @@ const port = process.env.PORT ? Number(process.env.PORT) : 3000;
 const app = express();
 app.use(express.json());
 
-const todosStorage: Todo[] = [];
+const todosStorage: ITodo[] = [];
 
 app.listen(port, host, () => {
   console.log(`[ ready ] http://${host}:${port}`);
@@ -30,7 +30,7 @@ app.post('/api/todos', (req, res) => {
       .json({ error: 'Invalid todo data, userId is missing' });
   }
 
-  const newTodo: Todo = { id, title, userId, description, status };
+  const newTodo: ITodo = { id, title, userId, description, status };
 
   // Adds the new todo to the todo array
   todosStorage.push(newTodo);
