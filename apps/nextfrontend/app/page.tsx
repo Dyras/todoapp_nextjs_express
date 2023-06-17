@@ -6,9 +6,13 @@ import { ITodo } from './lib/ITodo';
 import styles from './page.module.css';
 
 export default function Home() {
+  // Stores the todos
   const [todos, setTodos] = useState<ITodo[]>([]);
+  // Stores the edit mode
   const [editMode, setEditMode] = useState<boolean>(false);
+  // Stores the todo that is being edited
   const [editingTodo, setEditingTodo] = useState<ITodo | null>(null);
+  // Stores the title and description that has been entered
   const [editTitle, setEditTitle] = useState<string>('');
   const [editDescription, setEditDescription] = useState<string>('');
 
@@ -18,11 +22,11 @@ export default function Home() {
       localStorage.setItem('token', Math.random().toString(36));
     }
     const token = localStorage.getItem('token');
+    // Fetch the todos from the backend
     async function fetchTodos() {
       const response = await fetch(`http://localhost:3000/api/todos/${token}`);
       if (response.ok) {
         const data = await response.json();
-        console.log(data.todos);
         setTodos(data.todos);
       } else {
         setTodos([]);
@@ -145,7 +149,6 @@ export default function Home() {
         }),
       });
       if (response.ok) {
-        console.log('Todo added');
         const data = await response.json();
         setTodos([...todos, data.todo]);
         // Clear the document fields
@@ -191,7 +194,6 @@ export default function Home() {
       }),
     });
     if (response.ok) {
-      console.log('Todo edited');
       // Edit the todo in the state
       const newTodosList = todos.map((todo) => {
         if (todo.id === editingTodo.id) {
@@ -223,7 +225,6 @@ export default function Home() {
         }),
       });
       if (response.ok) {
-        console.log('Todo completed');
         // Set the todo to completed in the Array
         const newTodosList = todos.map((todo) => {
           if (todo.id === todoToComplete) {
