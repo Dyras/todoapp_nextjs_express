@@ -21,6 +21,7 @@ export default function Home() {
         console.log(data.todos);
         setTodos(data.todos);
       } else {
+        setTodos([]);
         console.error('Error:', response.status);
       }
     }
@@ -30,15 +31,30 @@ export default function Home() {
   return (
     <div className={styles.container}>
       <main className={styles.main}>
+        <h1 className={styles.title}>Add Todo</h1>
+        <form onSubmit={addTodo}>
+          <label htmlFor="title">Title:</label>
+          <input id="title" type="text" autoComplete="title" required />
+          <label htmlFor="description">Description:</label>
+          <input
+            id="description"
+            type="text"
+            autoComplete="description"
+            required
+          />
+          <button type="submit">Submit</button>
+        </form>
+
         <h1 className={styles.title}>Todos</h1>
         <div>
           {todos.map((todo) => (
             <div key={todo.id}>
               {todo.status === false ? (
                 <div>
-                  <h2>{todo.title}</h2>
+                  <h1>{todo.title}</h1>
                   <p>{todo.description}</p>
                   <p onClick={completeTodo(todo.id)}>Click to complete</p>
+                  <br />
                 </div>
               ) : null}
             </div>
@@ -60,6 +76,35 @@ export default function Home() {
       </main>
     </div>
   );
+
+  async function addTodo(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const title = (document.getElementById('title') as HTMLInputElement).value;
+    const description = (
+      document.getElementById('description') as HTMLInputElement
+    ).value;
+    if (title !== undefined && description !== undefined) {
+      const response = await fetch(`http://localhost:3000/api/todos`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: Math.random().toString(36),
+          userId: localStorage.getItem('token'),
+          title,
+          description,
+        }),
+      });
+      if (response.ok) {
+        console.log('Todo added');
+        const data = await response.json();
+        setTodos([...todos, data.todo]);
+      } else {
+        console.error('Error:', response.status);
+      }
+    }
+  }
 
   function completeTodo(todoToComplete: string) {
     return async function () {
