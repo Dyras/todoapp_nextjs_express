@@ -38,7 +38,20 @@ export default function Home() {
                 <div>
                   <h2>{todo.title}</h2>
                   <p>{todo.description}</p>
-                  <p>Click to complete</p>
+                  <p onClick={completeTodo(todo.id)}>Click to complete</p>
+                </div>
+              ) : null}
+            </div>
+          ))}
+        </div>
+        <h1 className={styles.title}>Completed Todos</h1>
+        <div>
+          {todos.map((todo) => (
+            <div key={todo.id}>
+              {todo.status === true ? (
+                <div>
+                  <h2>{todo.title}</h2>
+                  <p>{todo.description}</p>
                 </div>
               ) : null}
             </div>
@@ -47,4 +60,32 @@ export default function Home() {
       </main>
     </div>
   );
+
+  function completeTodo(todoToComplete: string) {
+    return async function () {
+      const response = await fetch(`http://localhost:3000/api/todos/complete`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: todoToComplete,
+          userId: localStorage.getItem('token'),
+        }),
+      });
+      if (response.ok) {
+        console.log('Todo completed');
+        // Set the todo to completed in the Array
+        const newTodosList = todos.map((todo) => {
+          if (todo.id === todoToComplete) {
+            todo.status = true;
+          }
+          return todo;
+        });
+        setTodos(newTodosList);
+      } else {
+        console.error('Error:', response.status);
+      }
+    };
+  }
 }
