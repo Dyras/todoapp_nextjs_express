@@ -34,9 +34,13 @@ export default function Home() {
         <div>
           {todos.map((todo) => (
             <div key={todo.id}>
-              <h2>{todo.title}</h2>
-              <p>{todo.description}</p>
-              <p>Click to complete</p>
+              {todo.status === false ? (
+                <div>
+                  <h2>{todo.title}</h2>
+                  <p>{todo.description}</p>
+                  <p>Click to complete</p>
+                </div>
+              ) : null}
             </div>
           ))}
         </div>
