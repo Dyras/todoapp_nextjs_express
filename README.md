@@ -2,12 +2,12 @@
 
 This is a monorepo with both a Next.js frontend and an Express backend.
 
-Together they allow the user to store todos in memory. If more than one user is using the same server, they cannot see eachother's todos.
+Together they allow the user to store todos in memory. If more than one user is using the same server, they cannot see each other's todos.
 
 
 ## Start the app 
 
-To start the development server run `nx serve expressbackend`. Open your browser and navigate to http://localhost:4200/. Happy coding!
+To start the development server for Express, run `nx serve expressbackend`. To start the development server for Next, run `nx serve nextfrontend`. Then open your browser and navigate to http://localhost:4200/. Happy coding!
 
 ## Generate code
 
