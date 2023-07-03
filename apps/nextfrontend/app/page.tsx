@@ -41,32 +41,36 @@ export default function Home() {
       {!editMode ? (
         <main className={styles.main}>
           <h1 className={styles.title}>Add Todo</h1>
-          <form onSubmit={addTodo}>
-            <label htmlFor="title">Title:</label>
-            <input
-              id="title"
-              type="text"
-              autoComplete="title"
-              value={editTitle}
-              onChange={(e) => setEditTitle(e.target.value)}
-              required
-            />
-            <label htmlFor="description">Description:</label>
-            <input
-              id="description"
-              type="text"
-              autoComplete="description"
-              value={editDescription}
-              onChange={(e) => setEditDescription(e.target.value)}
-              required
-            />
-            <button type="submit">Submit</button>
-          </form>
+          <div className={styles.inputContainer}>
+            <form className={styles.inputs} onSubmit={addTodo}>
+              <label htmlFor="title">Title:</label>
+              <input
+                id="title"
+                type="text"
+                autoComplete="title"
+                className={styles.input}
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                required
+              />
+              <label htmlFor="description">Description:</label>
+              <input
+                id="description"
+                type="text"
+                autoComplete="description"
+                className={styles.input}
+                value={editDescription}
+                onChange={(e) => setEditDescription(e.target.value)}
+                required
+              />
+              <button type="submit">Submit</button>
+            </form>
+          </div>
 
           <h1 className={styles.title}>Todos</h1>
           <div>
             {todos.map((todo) => (
-              <div key={todo.id}>
+              <div className={styles.todoContainer} key={todo.id}>
                 {todo.status === false ? (
                   <div>
                     <h1>{todo.title}</h1>
@@ -81,7 +85,7 @@ export default function Home() {
             ))}
           </div>
           <h1 className={styles.title}>Completed Todos</h1>
-          <div>
+          <div className={styles.todoContainer}>
             {todos.map((todo) => (
               <div key={todo.id}>
                 {todo.status === true ? (

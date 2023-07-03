@@ -1,4 +1,31 @@
 .title {
   margin-top: 30px;
   font-size: x-large;
+  display: flex;
+  justify-content: center;
+}
+
+.inputContainer {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 30px;
+}
+
+.inputs {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  margin-top: 30px;
+}
+.input {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.todoContainer {
+  margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
