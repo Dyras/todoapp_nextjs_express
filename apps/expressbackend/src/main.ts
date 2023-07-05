@@ -2,9 +2,6 @@ import { ITodo } from './Itodo';
 import cors from 'cors';
 import express from 'express';
 
-// Things to do:
-// 1. Add a PUT for completing a todo
-
 const host = process.env.HOST ?? 'localhost';
 const port = process.env.PORT ? Number(process.env.PORT) : 3000;
 
